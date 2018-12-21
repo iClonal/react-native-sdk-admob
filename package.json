@@ -1,0 +1,25 @@
+{
+  "name": "react-native-sdk-admob",
+  "version": "1.0.0",
+  "description": "Admob Sdk from React Native",
+  "types": "index.d.ts",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native",
+    "sdk",
+    "admob"
+  ],
+  "author": "Wei Jian <wei.jian.coder+github@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/iChonal/react-native-sdk-admob#readme",
+  "peerDependencies": {
+    "react-native": "^0.41.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iChonal/react-native-sdk-admob.git"
+  }
+}
