@@ -23,6 +23,7 @@ static NSString *const kEventVideoStarted = @"rewardedVideoAdVideoStarted";
     RCTPromiseResolveBlock _requestAdResolve;
     RCTPromiseRejectBlock _requestAdReject;
     BOOL hasListeners;
+    BOOL requesting;
 }
 
 - (id)init
@@ -34,6 +35,7 @@ static NSString *const kEventVideoStarted = @"rewardedVideoAdVideoStarted";
         } else {
             _adUnitID = TEST_REWARDED_ADUNIT_ID;
         }
+        requesting = NO;
     }
     return self;
 }
@@ -78,7 +80,11 @@ RCT_EXPORT_METHOD(requestAd) //:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
 {
     //_requestAdResolve = resolve;
     //_requestAdReject = reject;
-    if ([[GADRewardBasedVideoAd sharedInstance] isReady]) return;
+    BOOL ready = [[GADRewardBasedVideoAd sharedInstance] isReady];
+    if (!!ready) return;
+    
+    if (requesting) return;
+    requesting = YES;
     
     [GADRewardBasedVideoAd sharedInstance].delegate = self;
     GADRequest *request = [GADRequest request];
@@ -102,7 +108,8 @@ RCT_EXPORT_METHOD(showAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRej
 
 RCT_EXPORT_METHOD(isReady:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-    resolve(@[[NSNumber numberWithBool:[[GADRewardBasedVideoAd sharedInstance] isReady]]]);
+    BOOL ready = [[GADRewardBasedVideoAd sharedInstance] isReady];
+    resolve(@[[NSNumber numberWithBool:ready]]);
 }
 
 - (NSDictionary<NSString *,id> *)constantsToExport
@@ -133,6 +140,7 @@ RCT_EXPORT_METHOD(isReady:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRe
 
 - (void)rewardBasedVideoAdDidReceiveAd:(__unused GADRewardBasedVideoAd *)rewardBasedVideoAd
 {
+    requesting = NO;
     if (hasListeners) {
         [self sendEventWithName:kEventAdLoaded body:nil];
     }
@@ -170,6 +178,7 @@ RCT_EXPORT_METHOD(isReady:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRe
 - (void)rewardBasedVideoAd:(__unused GADRewardBasedVideoAd *)rewardBasedVideoAd
     didFailToLoadWithError:(NSError *)error
 {
+    requesting = NO;
     if (hasListeners) {
         NSDictionary *jsError = RCTJSErrorFromCodeMessageAndNSError(@"E_AD_FAILED_TO_LOAD", error.localizedDescription, error);
         [self sendEventWithName:kEventAdFailedToLoad body:jsError];
