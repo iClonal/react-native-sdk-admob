@@ -38,8 +38,6 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
     String adUnitID;
     String[] testDevices;
 
-    private Promise mRequestAdPromise;
-
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -81,7 +79,6 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
     @Override
     public void onRewardedVideoAdLoaded() {
         sendEvent(EVENT_AD_LOADED, null);
-        mRequestAdPromise.resolve(null);
     }
 
     @Override
@@ -130,7 +127,6 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
         WritableMap error = Arguments.createMap();
         event.putString("message", errorMessage);
         sendEvent(EVENT_AD_FAILED_TO_LOAD, event);
-        mRequestAdPromise.reject(errorString, errorMessage);
     }
 
     private void sendEvent(String eventName, @Nullable WritableMap params) {
@@ -150,7 +146,7 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
     }
 
     @ReactMethod
-    public void requestAd(final Promise promise) {
+    public void requestAd() {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -158,11 +154,7 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
 
                 RNSGADRewardedModule.this.mRewardedVideoAd.setRewardedVideoAdListener(RNSGADRewardedModule.this);
 
-                if (mRewardedVideoAd.isLoaded()) {
-                    promise.reject("E_AD_ALREADY_LOADED", "Ad is already loaded.");
-                } else {
-                    mRequestAdPromise = promise;
-
+                if (!mRewardedVideoAd.isLoaded()) {
                     AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
 
                     if (testDevices != null) {

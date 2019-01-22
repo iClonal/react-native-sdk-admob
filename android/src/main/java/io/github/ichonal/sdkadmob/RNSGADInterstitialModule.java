@@ -36,8 +36,6 @@ public class RNSGADInterstitialModule extends ReactContextBaseJavaModule {
     InterstitialAd mInterstitialAd;
     String[] testDevices;
 
-    private Promise mRequestAdPromise;
-
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -95,7 +93,6 @@ public class RNSGADInterstitialModule extends ReactContextBaseJavaModule {
                         WritableMap error = Arguments.createMap();
                         event.putString("message", errorMessage);
                         sendEvent(EVENT_AD_FAILED_TO_LOAD, event);
-                        mRequestAdPromise.reject(errorString, errorMessage);
                     }
                     @Override
                     public void onAdLeftApplication() {
@@ -104,7 +101,6 @@ public class RNSGADInterstitialModule extends ReactContextBaseJavaModule {
                     @Override
                     public void onAdLoaded() {
                         sendEvent(EVENT_AD_LOADED, null);
-                        mRequestAdPromise.resolve(null);
                     }
                     @Override
                     public void onAdOpened() {
@@ -133,14 +129,13 @@ public class RNSGADInterstitialModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void requestAd(final Promise promise) {
+    public void requestAd() {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run () {
                 if (mInterstitialAd.isLoaded() || mInterstitialAd.isLoading()) {
-                    promise.reject("E_AD_ALREADY_LOADED", "Ad is already loaded.");
+                    return;
                 } else {
-                    mRequestAdPromise = promise;
                     AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
                     if (testDevices != null) {
                         for (int i = 0; i < testDevices.length; i++) {
