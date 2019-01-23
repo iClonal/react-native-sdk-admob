@@ -150,7 +150,7 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                RNSGADRewardedModule.this.mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getCurrentActivity());
+                RNSGADRewardedModule.this.mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getReactApplicationContext());
 
                 RNSGADRewardedModule.this.mRewardedVideoAd.setRewardedVideoAdListener(RNSGADRewardedModule.this);
 
