@@ -9,6 +9,7 @@ export interface GADBannerProps extends ViewProps {
     adSize?: "banner" | "largeBanner" | "mediumRectangle" | "fullBanner" | "leaderboard" | "smartBannerPortrait" | "smartBannerLandscape";
     testDevices?: string[];
     onSizeChange?: (layout: {width: number, height: number}) => void;
+    onAdLoaded?: () => void;
     onAdFailedToLoad?: () => void;
     onAdOpened?: () => void;
     onAdClosed?: () => void;
