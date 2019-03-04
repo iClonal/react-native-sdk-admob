@@ -1,5 +1,6 @@
 package io.github.ichonal.sdkadmob;
 
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
@@ -150,7 +151,11 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                RNSGADRewardedModule.this.mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getReactApplicationContext());
+                Context ctx = RNSGADRewardedModule.this.getCurrentActivity();
+                if (ctx == null) {
+                    ctx = RNSGADRewardedModule.this.getReactApplicationContext();
+                }
+                RNSGADRewardedModule.this.mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(ctx);
 
                 RNSGADRewardedModule.this.mRewardedVideoAd.setRewardedVideoAdListener(RNSGADRewardedModule.this);
 
@@ -175,7 +180,7 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                if (mRewardedVideoAd.isLoaded()) {
+                if ((mRewardedVideoAd != null) && mRewardedVideoAd.isLoaded()) {
                     mRewardedVideoAd.show();
                     promise.resolve(null);
                 } else {
@@ -190,7 +195,7 @@ public class RNSGADRewardedModule extends ReactContextBaseJavaModule implements 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                promise.resolve(mRewardedVideoAd.isLoaded());
+                promise.resolve((mRewardedVideoAd != null) && mRewardedVideoAd.isLoaded());
             }
         });
     }
